@@ -3,11 +3,9 @@ const router = express.Router();
 const userCollection = require("../models/users");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
 const verifyToken = require("../middlewares/auth");
-const { ObjectId } = require("mongodb");
 
-// POST
+// Email pass signup
 router.post("/signup", async (req, res) => {
   try {
     const {
@@ -91,9 +89,9 @@ router.post("/verifyToken", verifyToken, (req, res) => {
   res.status(200).json({ message: "Token is valid" });
 });
 
+// Email pass login
 router.post("/login", async (req, res) => {
   try {
-    console.log("login route hit");
     const { email, password } = req.body;
 
     // Input validation:
@@ -111,8 +109,6 @@ router.post("/login", async (req, res) => {
       return; // Prevent duplicate error message in case both conditions are met
     }
 
-    // console.log(user);
-
     const token = jwt.sign(
       { id: user._id, email },
       "12345fhhhfkjhfnnvjfjjfjjfjfjjfjf",
@@ -127,6 +123,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// handle google login and signup
 router.post("/user", async (req, res) => {
   const user = req.body;
   // console.log(user);
