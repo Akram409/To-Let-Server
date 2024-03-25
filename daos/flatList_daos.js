@@ -1,0 +1,78 @@
+const mongoose = require("mongoose");
+
+const flatListSchema = mongoose.Schema({
+  userEmail: {
+    type: String,
+    required: true,
+  },
+  userId: {
+    type: String,
+    required: true,
+  },
+  flatList: {
+    description: {
+      type: {
+        type: String,
+        required: true,
+      },
+      bedroom: {
+        type: Number,
+        required: true,
+      },
+      bathroom: {
+        type: Number,
+        required: true,
+      },
+      size: {
+        type: Number,
+        required: true,
+      },
+      availableFrom: {
+        type: Date,
+        required: true,
+      },
+      location: {
+        address: {
+          type: String,
+          required: true,
+        },
+        city: {
+          type: String,
+          required: true,
+        },
+        postalCode: {
+          type: String,
+          required: true,
+        },
+      },
+    },
+    images: {
+      type: [String],
+      required: true,
+    },
+    contact_person: {
+      firstName: {
+        type: String,
+        required: true,
+      },
+      lastName: {
+        type: String,
+        required: true,
+      },
+      city: {
+        type: String,
+        required: true,
+      },
+      postalCode: {
+        type: String,
+        required: true,
+      },
+      Phone: {
+        type: String,
+        required: true,
+      },
+    },
+  },
+});
+
+module.exports = flatListSchema;
