@@ -10,23 +10,12 @@ router.post("/signup", async (req, res) => {
   try {
     const {
       username,
-      name,
       email,
-      dob,
-      bloodGroup,
-      gender,
-      religion,
-      status,
-      street,
-      city,
-      state,
-      postalCode,
-      phone,
-      emergency,
-      profile,
+      age,
+      user_image,
       password,
     } = req.body;
-    // console.log(req.body)
+    console.log(req.body)
 
     // Check if required fields are present
     if (!username || !email || !password) {
@@ -54,24 +43,12 @@ router.post("/signup", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
       username,
-      name,
       email,
-      dob,
-      bloodGroup,
-      gender,
-      religion,
-      status,
-      address: {
-        street,
-        city,
-        state,
-        postalCode,
-      },
-      phone,
-      emergency,
-      profile,
+      user_image,
+      age,
       password: hashedPassword,
-      calories: 0,
+      lastOnline: "",
+      onlineStatus: ""
     };
     const data = await userCollection.insertOne(newUser);
     // console.log(newUser)
