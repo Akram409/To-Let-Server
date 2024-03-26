@@ -65,7 +65,7 @@ const roommateListSchema = mongoose.Schema({
       required: true,
     },
     contactPerson: {
-      gender: {
+      userGender: {
         type: String,
         required: true,
       },
@@ -81,7 +81,7 @@ const roommateListSchema = mongoose.Schema({
         type: String,
         required: true,
       },
-      employmentStatus: {
+      userEmploymentStatus: {
         type: String,
         required: true,
       },

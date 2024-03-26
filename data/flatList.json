@@ -22,8 +22,8 @@
       "contact_person": {
         "firstName": "John",
         "lastName": "Doe",
-        "city": "Example City",
-        "postalCode": "12345",
+        "userCity": "Example City",
+        "userPostalCode": "12345",
         "Phone": "+1234567890"
       }
     }

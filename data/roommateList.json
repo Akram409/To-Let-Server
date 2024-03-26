@@ -25,11 +25,11 @@
         "https://example.com/image2.jpg"
       ],
       "contactPerson": {
-        "gender": "male",
+        "userGender": "male",
         "firstName": "Alex",
         "lastName": "Smith",
         "phone": "+1234567890",
-        "employmentStatus": "student"
+        "userEmploymentStatus": "student"
       }
     }
   }
