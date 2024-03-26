@@ -59,11 +59,11 @@ const flatListSchema = mongoose.Schema({
         type: String,
         required: true,
       },
-      city: {
+      userCity: {
         type: String,
         required: true,
       },
-      postalCode: {
+      userPostalCode: {
         type: String,
         required: true,
       },
