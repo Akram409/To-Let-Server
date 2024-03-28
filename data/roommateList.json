@@ -1,6 +1,7 @@
 [
   {
     "userEmail": "user@example.com",
+    "userImage": "",
     "userId": "1234567890",
     "roomateList": {
       "description": {

@@ -5,6 +5,10 @@ const roommateListSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  userImage: {
+    type: String,
+    required: true,
+  },
   userId: {
     type: String,
     required: true,
