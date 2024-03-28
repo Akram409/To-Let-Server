@@ -9,21 +9,22 @@ const verifyToken = require("../middlewares/auth");
 router.post("/signup", async (req, res) => {
   try {
     const {
-      username,
+      firstName,
+      lastName,
       email,
-      age,
-      user_image,
       password,
+      user_image,
+      age,
+      address, city, postalCode
     } = req.body;
-    console.log(req.body)
 
     // Check if required fields are present
-    if (!username || !email || !password) {
+    if (!firstName ||!lastName || !email || !password) {
       throw new Error("All fields are required");
     }
 
     // Perform duplicate checks
-    const existingUserByUsername = await userCollection.findOne({ username });
+    const existingUserByUsername = await userCollection.findOne({ firstName });
     const existingUserByEmail = await userCollection.findOne({ email });
 
     if (existingUserByUsername) {
@@ -42,13 +43,13 @@ router.post("/signup", async (req, res) => {
     // Hash password and create new user object
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
-      username,
+      firstName,
+      lastName,
       email,
+      password,
       user_image,
       age,
-      password: hashedPassword,
-      lastOnline: "",
-      onlineStatus: ""
+      location: { address, city, postalCode }
     };
     const data = await userCollection.insertOne(newUser);
     // console.log(newUser)
@@ -114,7 +115,7 @@ router.post("/user", async (req, res) => {
   res.send(result);
 });
 
-router.get("/user", async (req, res) => {
+router.get("/users", async (req, res) => {
   try {
     const user = await userCollection.find().toArray();
     res.json(user);
