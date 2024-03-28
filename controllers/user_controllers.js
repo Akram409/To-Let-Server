@@ -19,7 +19,7 @@ router.post("/signup", async (req, res) => {
     } = req.body;
 
     // Check if required fields are present
-    if (!firstName ||!lastName || !email || !password) {
+    if (!firstName || !lastName || !email || !password) {
       throw new Error("All fields are required");
     }
 
@@ -133,5 +133,47 @@ router.get("/user/:email", async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 });
+
+//patch code 
+router.patch("/user/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log(id);
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      user_image,
+      age,
+      location: { address, city, postalCode }
+    } = req.body; 
+
+    const updatedData = {
+      firstName,
+      lastName,
+      email,
+      password,
+      user_image,
+      age,
+      location: { address, city, postalCode }
+    };
+
+    console.log(updatedData);
+    // Update the user data in the database
+    const updatedUser = await userCollection.findByIdAndUpdate( id,
+      { $set: updatedData },
+      { new: true } 
+    );
+
+    res.status(200).json({ message: "User updated successfully", updatedUser });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+
+
 
 module.exports = router;
