@@ -6,7 +6,28 @@ const router = express.Router();
 
 router.get("/flatList", async (req, res) => {
     try {
-        const data = await flatListCollection.find().toArray();
+        const { search, sort } = req.query;
+        let query = {};
+
+       
+        if (search) {
+            query = {
+                $or: [
+                    { "flatList.description.location.address": { $regex: new RegExp(search, "i") } },
+                    { "flatList.description.location.city": { $regex: new RegExp(search, "i") } }
+                ]
+            };
+        }
+
+        // Sort 
+        let sortOption = {};
+        if (sort === "High To Low") {
+            sortOption = { "flatList.price": -1 };
+        } else if (sort === "Low To High") {
+            sortOption = { "flatList.price": 1 };
+        }
+
+        const data = await flatListCollection.find(query).sort(sortOption).toArray();
         res.json(data);
     } catch (error) {
         res.status(500).json({ error: "Internal server error." });
