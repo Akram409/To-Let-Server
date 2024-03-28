@@ -93,4 +93,4 @@ const roommateListSchema = mongoose.Schema({
   },
 });
 
-module.exports = roommateListSchema;
+module.exports = mongoose.model("roommateList", roommateListSchema);

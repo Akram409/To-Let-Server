@@ -67,7 +67,7 @@ const flatListSchema = mongoose.Schema({
         type: String,
         required: true,
       },
-      Phone: {
+      phone: {
         type: String,
         required: true,
       },
@@ -75,4 +75,4 @@ const flatListSchema = mongoose.Schema({
   },
 });
 
-module.exports = flatListSchema;
+module.exports = mongoose.model("flatList", flatListSchema);
