@@ -1,0 +1,15 @@
+[
+  {
+    "userEmail": "user@example.com",
+    "flatWishList": [
+      {
+        "id": "https://example.com/image1.jpg"
+      }
+    ],
+    "roommateWishList": [
+      {
+        "id": "https://example.com/image1.jpg"
+      }
+    ]
+  }
+]
