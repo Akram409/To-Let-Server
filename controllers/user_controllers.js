@@ -4,19 +4,51 @@ const userCollection = require("../models/users");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const verifyToken = require("../middlewares/auth");
+const multer = require("multer");
+const path = require("path");
+const UPLOAD_FOLDER = "./public/image";
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, UPLOAD_FOLDER);
+  },
+  filename: (req, file, cb) => {
+    if (file) {
+      const fileExt = path.extname(file.originalname);
+      const fileName =
+        file.originalname
+          .replace(fileExt, "")
+          .toLowerCase()
+          .split(" ")
+          .join("-") +
+        "-" +
+        Date.now();
+      console.log("🚀 ~ fileName:", fileName);
+      cb(null, fileName + fileExt);
+    }
+  },
+});
+
+var upload = multer({
+  storage: storage,
+});
 
 // Email pass signup
-router.post("/signup", async (req, res) => {
+router.post("/signup", upload.single("images"), async (req, res) => {
   try {
     const {
       firstName,
       lastName,
       email,
       password,
-      user_image,
       age,
-      address, city, postalCode
+      address,
+      city,
+      postalCode,
     } = req.body;
+    const filenames = req.file.filename;
+    // console.log("🚀 ~ router.post ~ filenames:", filenames);
+    console.log("dfs", req.body);
 
     // Check if required fields are present
     if (!firstName || !lastName || !email || !password) {
@@ -24,14 +56,7 @@ router.post("/signup", async (req, res) => {
     }
 
     // Perform duplicate checks
-    const existingUserByUsername = await userCollection.findOne({ firstName });
     const existingUserByEmail = await userCollection.findOne({ email });
-
-    if (existingUserByUsername) {
-      return res.status(400).json({
-        error: "Username already exists. Please choose a different username.",
-      });
-    }
 
     if (existingUserByEmail) {
       return res.status(400).json({
@@ -46,13 +71,14 @@ router.post("/signup", async (req, res) => {
       firstName,
       lastName,
       email,
-      password,
-      user_image,
+      password: hashedPassword,
+      user_image: filenames,
       age,
-      location: { address, city, postalCode }
+      location: { address, city, postalCode },
     };
-    const data = await userCollection.insertOne(newUser);
     // console.log(newUser)
+    // return { newUser };
+    const data = await userCollection.insertOne(newUser);
 
     res
       .status(201)
@@ -134,7 +160,7 @@ router.get("/user/:email", async (req, res) => {
   }
 });
 
-//patch code 
+//patch code
 router.patch("/user/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -146,8 +172,8 @@ router.patch("/user/:id", async (req, res) => {
       password,
       user_image,
       age,
-      location: { address, city, postalCode }
-    } = req.body; 
+      location: { address, city, postalCode },
+    } = req.body;
 
     const updatedData = {
       firstName,
@@ -156,14 +182,15 @@ router.patch("/user/:id", async (req, res) => {
       password,
       user_image,
       age,
-      location: { address, city, postalCode }
+      location: { address, city, postalCode },
     };
 
     console.log(updatedData);
     // Update the user data in the database
-    const updatedUser = await userCollection.findByIdAndUpdate( id,
+    const updatedUser = await userCollection.findByIdAndUpdate(
+      id,
       { $set: updatedData },
-      { new: true } 
+      { new: true }
     );
 
     res.status(200).json({ message: "User updated successfully", updatedUser });
@@ -172,8 +199,5 @@ router.patch("/user/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 });
-
-
-
 
 module.exports = router;
