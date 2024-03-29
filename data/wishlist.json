@@ -1,6 +1,7 @@
 [
   {
     "userEmail": "user@example.com",
+    "userId": "23423423423423",
     "flatWishList": [
       {
         "id": "https://example.com/image1.jpg"

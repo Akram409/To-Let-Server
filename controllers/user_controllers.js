@@ -4,35 +4,56 @@ const userCollection = require("../models/users");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const verifyToken = require("../middlewares/auth");
-const { ObjectId } = require("mongodb");
+const multer = require("multer");
+const path = require("path");
+const UPLOAD_FOLDER = "./public/image";
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, UPLOAD_FOLDER);
+  },
+  filename: (req, file, cb) => {
+    if (file) {
+      const fileExt = path.extname(file.originalname);
+      const fileName =
+        file.originalname
+          .replace(fileExt, "")
+          .toLowerCase()
+          .split(" ")
+          .join("-") +
+        "-" +
+        Date.now();
+      console.log("🚀 ~ fileName:", fileName);
+      cb(null, fileName + fileExt);
+    }
+  },
+});
+
+var upload = multer({
+  storage: storage,
+});
 
 // Email pass signup
-router.post("/signup", async (req, res) => {
+router.post("/signup",upload.single("images"), async (req, res) => {
   try {
     const {
       firstName,
       lastName,
       email,
       password,
-      user_image,
       age,
-      address, city, postalCode
+      address, 
+      city, 
+      postalCode
     } = req.body;
-
+    const filenames = req.file.filename;
     // Check if required fields are present
     if (!firstName || !lastName || !email || !password) {
       throw new Error("All fields are required");
     }
 
     // Perform duplicate checks
-    const existingUserByUsername = await userCollection.findOne({ firstName });
     const existingUserByEmail = await userCollection.findOne({ email });
-
-    if (existingUserByUsername) {
-      return res.status(400).json({
-        error: "Username already exists. Please choose a different username.",
-      });
-    }
 
     if (existingUserByEmail) {
       return res.status(400).json({
@@ -47,8 +68,8 @@ router.post("/signup", async (req, res) => {
       firstName,
       lastName,
       email,
-      password,
-      user_image,
+      password:hashedPassword,
+      user_image: filenames,
       age,
       location: { address, city, postalCode }
     };
@@ -64,8 +85,10 @@ router.post("/signup", async (req, res) => {
 });
 
 // Route to verify token
-router.post("/verifyToken", verifyToken, (req, res) => {
-  res.status(200).json({ message: "Token is valid" });
+router.get("/verifyToken", verifyToken, (req, res) => {
+  // console.log("dsf",req.user)
+  // { auth: true, token, email: user.email }
+  res.status(200).json({ auth: true, user: req.user.user });
 });
 
 // Email pass login
@@ -89,14 +112,14 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, email },
+      { user },
       "12345fhhhfkjhfnnvjfjjfjjfjfjjfjf",
       { expiresIn: "7d" }
     );
 
     // console.log(token);
 
-    res.json({ auth: true, token, email: user.email });
+    res.json({ auth: true, token, user: user });
   } catch (error) {
     res.status(500).json({ error: "Internal server error." });
   }

@@ -7,10 +7,12 @@ const client = require("./client/mongo");
 const userController = require("./controllers/user_controllers");
 const flatListController = require("./controllers/flatList_controllers");
 const roommateListController = require("./controllers/roommateList_controllers");
+const wishListController = require("./controllers/wishlist_controllers");
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 require("dotenv").config();
 
 async function run() {
@@ -21,6 +23,7 @@ async function run() {
     app.use("/", userController);
     app.use("/", flatListController);
     app.use("/", roommateListController);
+    app.use("/", wishListController);
 
     // Generate random secret key
     const generateSecretKey = () => {
