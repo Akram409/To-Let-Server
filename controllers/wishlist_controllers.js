@@ -13,4 +13,29 @@ router.get("/wishList", async (req, res) => {
   }
 });
 
+
+// ------------------Wishlist POST Route--------------------- 
+
+router.post("/wishlist", async (req, res) => {
+  try {
+    const { userEmail, userId, flatWishList, roommateWishList } = req.body;
+
+    // Create a new wishlist 
+    const newWishlist = new Wishlist({
+      userEmail,
+      userId,
+      flatWishList,
+      roommateWishList
+    });
+
+    const savedWishlist = await newWishlist.save();
+
+    res.status(201).json(savedWishlist);
+  } catch (err) {
+    
+    res.status(400).json({ message: err.message });
+  }
+});
+
+
 module.exports = router;

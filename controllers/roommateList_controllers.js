@@ -47,17 +47,17 @@ router.get("/roommateList", async (req, res) => {
       }
 
       // Filter by gender 
-      if (gender) {
-          query["roomateList.roomatePreferences.gender"] = gender;
+      if (gender && (gender.toLowerCase() === 'female' || gender.toLowerCase() === 'male')) {
+        query["roomateList.roomatePreferences.gender"] = gender; // No need for regex here
       }
 
-      // Sort by price
-      let sortOption = {};
-      if (sort === "High To Low") {
-          sortOption = { "roomateList.price": -1 };
-      } else if (sort === "Low To High") {
-          sortOption = { "roomateList.price": 1 };
-      }
+      // Sort by rent (price)
+    let sortOption = {};
+    if (sort === "High To Low") {
+      sortOption = { "roomateList.description.rent": -1 }; // Sort by rent in descending order
+    } else if (sort === "Low To High") {
+      sortOption = { "roomateList.description.rent": 1 }; // Sort by rent in ascending order
+    }
 
       const data = await roommateListCollection.find(query).sort(sortOption).toArray();
       res.json(data);

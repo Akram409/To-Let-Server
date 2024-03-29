@@ -49,9 +49,9 @@ router.get("/flatList", async (req, res) => {
         // Sort 
         let sortOption = {};
         if (sort === "High To Low") {
-            sortOption = { "flatList.price": -1 };
+            sortOption = { "flatList.description.rent": -1 }; // Sort by rent in descending order
         } else if (sort === "Low To High") {
-            sortOption = { "flatList.price": 1 };
+            sortOption = { "flatList.description.rent": 1 }; // Sort by rent in ascending order
         }
 
         const data = await flatListCollection.find(query).sort(sortOption).toArray();
