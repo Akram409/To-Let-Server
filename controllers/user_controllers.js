@@ -163,6 +163,7 @@ router.patch("/update/:email", async (req, res) => {
   try {
     const email = req.params.email;
     console.log(email);
+    
     const {
       firstName,
       lastName,
@@ -188,6 +189,47 @@ router.patch("/update/:email", async (req, res) => {
       { email }, 
       { $set: updatedData }, 
       { new: true } 
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    res.status(200).json({ message: "User updated successfully", updatedUser });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+router.patch("/update/:email", async (req, res) => {
+  try {
+    const email = req.params.email;
+    console.log(email);
+    const {
+      firstName,
+      lastName,
+      email: newEmail, // Use 'newEmail' to avoid conflict with the 'email' variable
+      password,
+      user_image,
+      age,
+      location: { address, city, postalCode }
+    } = req.body; 
+
+    const updatedData = {
+      firstName,
+      lastName,
+      email: newEmail, // Assign 'newEmail' to 'email' field in 'updatedData'
+      password,
+      user_image,
+      age,
+      location: { address, city, postalCode }
+    };
+
+    // Update the user data in the database
+    const updatedUser = await userCollection.findOneAndUpdate(
+      { email }, // Filter object
+      { $set: updatedData }, // Update object
+      { new: true } // Options: Return the updated document
     );
 
     if (!updatedUser) {
