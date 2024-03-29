@@ -8,6 +8,7 @@
         "bedroomType": "private",
         "bathroom": 1,
         "size": 150,
+        "rent": 150,
         "availableFrom": "2024-04-01",
         "location": {
           "address": "456 Elm St",

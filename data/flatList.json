@@ -8,6 +8,7 @@
         "bedroom": 2,
         "bathroom": 1,
         "size": 1000,
+        "rent": 1000,
         "availableFrom": "2024-04-01",
         "location": {
           "address": "123 Main St",
@@ -24,7 +25,7 @@
         "lastName": "Doe",
         "userCity": "Example City",
         "userPostalCode": "12345",
-        "Phone": "+1234567890"
+        "phone": "+1234567890"
       }
     }
   }

@@ -18,7 +18,7 @@ const userSchema = mongoose.Schema({
     required: true,
   },
   user_image: {
-    type: String,
+    type: [String],
     required: true,
   },
   age: {

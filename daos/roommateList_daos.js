@@ -27,6 +27,10 @@ const roommateListSchema = mongoose.Schema({
         type: Number,
         required: true,
       },
+      rent: {
+        type: Number,
+        required: true,
+      },
       availableFrom: {
         type: Date,
         required: true,
@@ -93,4 +97,4 @@ const roommateListSchema = mongoose.Schema({
   },
 });
 
-module.exports = roommateListSchema;
+module.exports = mongoose.model("roommateList", roommateListSchema);

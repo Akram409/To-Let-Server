@@ -11,6 +11,7 @@ const roommateListController = require("./controllers/roommateList_controllers")
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
 require("dotenv").config();
 
 async function run() {
