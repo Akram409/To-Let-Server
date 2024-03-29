@@ -72,7 +72,7 @@ router.post("/verifyToken", verifyToken, (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
+      console.log(email, password);
     // Input validation:
     if (!email || !password) {
       throw new Error("Both email and password are required.");
@@ -185,7 +185,7 @@ router.patch("/update/:email", async (req, res) => {
     const {
       firstName,
       lastName,
-      email: newEmail, // Use 'newEmail' to avoid conflict with the 'email' variable
+      email: newEmail, 
       password,
       user_image,
       age,
@@ -195,7 +195,7 @@ router.patch("/update/:email", async (req, res) => {
     const updatedData = {
       firstName,
       lastName,
-      email: newEmail, // Assign 'newEmail' to 'email' field in 'updatedData'
+      email: newEmail, 
       password,
       user_image,
       age,
