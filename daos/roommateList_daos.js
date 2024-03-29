@@ -27,6 +27,10 @@ const roommateListSchema = mongoose.Schema({
         type: Number,
         required: true,
       },
+      rent: {
+        type: Number,
+        required: true,
+      },
       availableFrom: {
         type: Date,
         required: true,

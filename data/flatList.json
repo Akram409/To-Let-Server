@@ -8,6 +8,7 @@
         "bedroom": 2,
         "bathroom": 1,
         "size": 1000,
+        "rent": 1000,
         "availableFrom": "2024-04-01",
         "location": {
           "address": "123 Main St",

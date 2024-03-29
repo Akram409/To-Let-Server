@@ -34,7 +34,7 @@ var upload = multer({
 });
 
 // Email pass signup
-router.post("/signup", upload.single("images"), async (req, res) => {
+router.post("/signup",upload.single("images"), async (req, res) => {
   try {
     const {
       firstName,
@@ -42,14 +42,11 @@ router.post("/signup", upload.single("images"), async (req, res) => {
       email,
       password,
       age,
-      address,
-      city,
-      postalCode,
+      address, 
+      city, 
+      postalCode
     } = req.body;
     const filenames = req.file.filename;
-    // console.log("🚀 ~ router.post ~ filenames:", filenames);
-    console.log("dfs", req.body);
-
     // Check if required fields are present
     if (!firstName || !lastName || !email || !password) {
       throw new Error("All fields are required");
@@ -71,14 +68,13 @@ router.post("/signup", upload.single("images"), async (req, res) => {
       firstName,
       lastName,
       email,
-      password: hashedPassword,
+      password:hashedPassword,
       user_image: filenames,
       age,
-      location: { address, city, postalCode },
+      location: { address, city, postalCode }
     };
-    // console.log(newUser)
-    // return { newUser };
     const data = await userCollection.insertOne(newUser);
+    // console.log(newUser)
 
     res
       .status(201)
@@ -89,8 +85,10 @@ router.post("/signup", upload.single("images"), async (req, res) => {
 });
 
 // Route to verify token
-router.post("/verifyToken", verifyToken, (req, res) => {
-  res.status(200).json({ message: "Token is valid" });
+router.get("/verifyToken", verifyToken, (req, res) => {
+  // console.log("dsf",req.user)
+  // { auth: true, token, email: user.email }
+  res.status(200).json({ auth: true, user: req.user.user });
 });
 
 // Email pass login
@@ -114,14 +112,14 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, email },
+      { user },
       "12345fhhhfkjhfnnvjfjjfjjfjfjjfjf",
       { expiresIn: "7d" }
     );
 
     // console.log(token);
 
-    res.json({ auth: true, token, email: user.email });
+    res.json({ auth: true, token, user: user });
   } catch (error) {
     res.status(500).json({ error: "Internal server error." });
   }
@@ -160,38 +158,41 @@ router.get("/user/:email", async (req, res) => {
   }
 });
 
-//patch code
-router.patch("/user/:id", async (req, res) => {
+//patch code 
+router.patch("/update/:email", async (req, res) => {
   try {
-    const id = req.params.id;
-    console.log(id);
+    const email = req.params.email;
+    console.log(email);
     const {
       firstName,
       lastName,
-      email,
+      email: newEmail, 
       password,
       user_image,
       age,
-      location: { address, city, postalCode },
-    } = req.body;
+      location: { address, city, postalCode }
+    } = req.body; 
 
     const updatedData = {
       firstName,
       lastName,
-      email,
+      email: newEmail, 
       password,
       user_image,
       age,
-      location: { address, city, postalCode },
+      location: { address, city, postalCode }
     };
 
-    console.log(updatedData);
     // Update the user data in the database
-    const updatedUser = await userCollection.findByIdAndUpdate(
-      id,
-      { $set: updatedData },
-      { new: true }
+    const updatedUser = await userCollection.findOneAndUpdate(
+      { email }, 
+      { $set: updatedData }, 
+      { new: true } 
     );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found." });
+    }
 
     res.status(200).json({ message: "User updated successfully", updatedUser });
   } catch (error) {
@@ -199,5 +200,7 @@ router.patch("/user/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error." });
   }
 });
+
+
 
 module.exports = router;

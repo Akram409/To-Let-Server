@@ -42,7 +42,7 @@ router.get("/flatList", async (req, res) => {
 
 router.post("/add/flatList", upload.array("images", 10), async (req, res) => {
     try {
-      console.log("🚀 ~ router.post ~ req.body:", req.body); // This should contain userEmail and userId
+      // console.log("🚀 ~ router.post ~ req.body:", req.body); // This should contain userEmail and userId
     //   console.log("🚀 ~ router.post ~ req.files:", req.files); // This should contain uploaded files
   
       // Access userEmail and userId from req.body
@@ -54,6 +54,7 @@ router.post("/add/flatList", upload.array("images", 10), async (req, res) => {
         bedroom,
         bathroom,
         size,
+        rent,
         address,
         city,
         postalCode,
@@ -78,6 +79,7 @@ router.post("/add/flatList", upload.array("images", 10), async (req, res) => {
             bedroom,
             bathroom,
             size,
+            rent,
             availableFrom,
             location: {
               address,
