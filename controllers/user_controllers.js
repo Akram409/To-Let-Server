@@ -34,7 +34,7 @@ var upload = multer({
 });
 
 // Email pass signup
-router.post("/signup",upload.single("images"), async (req, res) => {
+router.post("/signup", upload.single("images"), async (req, res) => {
   try {
     const {
       firstName,
@@ -42,9 +42,9 @@ router.post("/signup",upload.single("images"), async (req, res) => {
       email,
       password,
       age,
-      address, 
-      city, 
-      postalCode
+      address,
+      city,
+      postalCode,
     } = req.body;
     const filenames = req.file.filename;
     // Check if required fields are present
@@ -68,10 +68,10 @@ router.post("/signup",upload.single("images"), async (req, res) => {
       firstName,
       lastName,
       email,
-      password:hashedPassword,
+      password: hashedPassword,
       user_image: filenames,
       age,
-      location: { address, city, postalCode }
+      location: { address, city, postalCode },
     };
     const data = await userCollection.insertOne(newUser);
     // console.log(newUser)
@@ -95,7 +95,7 @@ router.get("/verifyToken", verifyToken, (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-      console.log(email, password);
+    console.log(email, password);
     // Input validation:
     if (!email || !password) {
       throw new Error("Both email and password are required.");
@@ -111,11 +111,9 @@ router.post("/login", async (req, res) => {
       return; // Prevent duplicate error message in case both conditions are met
     }
 
-    const token = jwt.sign(
-      { user },
-      "12345fhhhfkjhfnnvjfjjfjjfjfjjfjf",
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ user }, "12345fhhhfkjhfnnvjfjjfjjfjfjjfjf", {
+      expiresIn: "7d",
+    });
 
     // console.log(token);
 
@@ -158,91 +156,54 @@ router.get("/user/:email", async (req, res) => {
   }
 });
 
-//patch code 
-router.patch("/update/:email", async (req, res) => {
+//patch
+router.patch("/update/:email", upload.single("images"), async (req, res) => {
   try {
     const email = req.params.email;
-    console.log(email);
+    const { firstName, lastName, age, address, city, postalCode, password } =
+      req.body;
     
-    const {
-      firstName,
-      lastName,
-      email: newEmail, 
-      password,
-      user_image,
-      age,
-      location: { address, city, postalCode }
-    } = req.body; 
+    let userToUpdate = {location:{}};
 
-    const updatedData = {
-      firstName,
-      lastName,
-      email: newEmail, 
-      password,
-      user_image,
-      age,
-      location: { address, city, postalCode }
-    };
+    // Retrieve existing user data
+    const existingUser = await userCollection.findOne({ email });
 
-    // Update the user data in the database
-    const updatedUser = await userCollection.findOneAndUpdate(
-      { email }, 
-      { $set: updatedData }, 
-      { new: true } 
-    );
-
-    if (!updatedUser) {
+    if (!existingUser) {
       return res.status(404).json({ error: "User not found." });
     }
 
-    res.status(200).json({ message: "User updated successfully", updatedUser });
+    // Update fields provided in the request body
+    if (firstName) userToUpdate.firstName = firstName;
+    if (lastName) userToUpdate.lastName = lastName;
+    if (age) userToUpdate.age = age;
+    if (address) userToUpdate.location.address = address;
+    if (city) userToUpdate.location.city = city;
+    if (postalCode) userToUpdate.location.postalCode = postalCode;
+
+    // If password is provided, hash it before updating
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      userToUpdate.password = hashedPassword;
+    }
+
+    // If an image is uploaded, update the image field
+    if (req.file) {
+      userToUpdate.user_image = req.file.filename;
+    }
+    console.log(userToUpdate);
+    // Update user data in the database
+    const result = await userCollection.updateOne(
+      { email },
+      { $set: userToUpdate }
+    );
+
+    res
+      .status(200)
+      .json({ message: "User updated successfully", data: userToUpdate });
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(500).json({ error: "Internal server error." });
   }
 });
-router.patch("/update/:email", async (req, res) => {
-  try {
-    const email = req.params.email;
-    console.log(email);
-    const {
-      firstName,
-      lastName,
-      email: newEmail, 
-      password,
-      user_image,
-      age,
-      location: { address, city, postalCode }
-    } = req.body; 
-
-    const updatedData = {
-      firstName,
-      lastName,
-      email: newEmail, 
-      password,
-      user_image,
-      age,
-      location: { address, city, postalCode }
-    };
-
-    // Update the user data in the database
-    const updatedUser = await userCollection.findOneAndUpdate(
-      { email }, // Filter object
-      { $set: updatedData }, // Update object
-      { new: true } // Options: Return the updated document
-    );
-
-    if (!updatedUser) {
-      return res.status(404).json({ error: "User not found." });
-    }
-
-    res.status(200).json({ message: "User updated successfully", updatedUser });
-  } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ error: "Internal server error." });
-  }
-});
-
-
 
 module.exports = router;
