@@ -4,6 +4,8 @@ require("dotenv").config();
 const path = require("path");
 const multer = require("multer");
 const flatListCollection = require("../models/flatList");
+const { log } = require("console");
+const { ObjectId } = require("mongodb");
 const router = express.Router();
 
 const storage = multer.diskStorage({
@@ -49,9 +51,9 @@ router.get("/flatList", async (req, res) => {
         // Sort 
         let sortOption = {};
         if (sort === "High To Low") {
-            sortOption = { "flatList.price": -1 };
+            sortOption = { "flatList.description.rent": -1 }; 
         } else if (sort === "Low To High") {
-            sortOption = { "flatList.price": 1 };
+            sortOption = { "flatList.description.rent": 1 }; 
         }
 
         const data = await flatListCollection.find(query).sort(sortOption).toArray();
@@ -108,7 +110,7 @@ router.post("/add/flatList", upload.array("images", 10), async (req, res) => {
               postalCode,
             },
           },
-          images: req.files.map((file) => file.filename), // Use filenames obtained from req.files
+          images: req.files.map((file) => file.filename),
           contact_person: {
             firstName,
             lastName,
@@ -131,13 +133,33 @@ router.post("/add/flatList", upload.array("images", 10), async (req, res) => {
   });
   
 
-router.get("/flatDetails/:id", async (req, res) => {
-  try {
-    const data = await flatListCollection.find().toArray();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error." });
-  }
+  router.get("/flatDetails", async (req, res) => {
+    try {
+      const data = await flatListCollection.find().toArray();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error." });
+    }
+  });
+
+
+  router.get("/flatDetails/:id", async (req, res) => {
+    try {
+        const _id = req.params.id;
+        console.log("flatId",typeof _id);
+        
+        const data = await flatListCollection.findOne(new ObjectId (_id))
+        if (data) {
+            res.json(data); 
+        } else {
+          console.log("Flat not found for ID:", _id)
+            res.status(404).json({ error: "Flat not found." });
+        }
+    } catch (error) {
+        console.error("Error fetching flat details:", error);
+        res.status(500).json({ error: "Internal server error." });
+    }
 });
+  
 
 module.exports = router;
