@@ -68,6 +68,16 @@ router.delete('/wishlists/:id', async (req, res) => {
 //   const result = await conceptualCollection.deleteOne(query)
 //   res.send(result)
 // })
+router.get("/wishList/:email", async (req, res) => {
+  const userEmail = req.params.email;
+
+  try {
+    const wish = await wishListCollection.find({ userEmail: userEmail }).toArray();
+    res.json(wish);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
 
 
 
