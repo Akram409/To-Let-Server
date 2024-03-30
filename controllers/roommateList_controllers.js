@@ -3,6 +3,7 @@ const roommateListCollection = require("../models/roommateList");
 const router = express.Router();
 const path = require("path");
 const multer = require("multer");
+const { ObjectId } = require("mongodb");
 const UPLOAD_FOLDER = "./public/image";
 
 const storage = multer.diskStorage({
@@ -48,15 +49,15 @@ router.get("/roommateList", async (req, res) => {
 
       // Filter by gender 
       if (gender && (gender.toLowerCase() === 'female' || gender.toLowerCase() === 'male')) {
-        query["roomateList.roomatePreferences.gender"] = gender; // No need for regex here
+        query["roomateList.roomatePreferences.gender"] = gender; 
       }
 
       // Sort by rent (price)
     let sortOption = {};
     if (sort === "High To Low") {
-      sortOption = { "roomateList.description.rent": -1 }; // Sort by rent in descending order
+      sortOption = { "roomateList.description.rent": -1 }; 
     } else if (sort === "Low To High") {
-      sortOption = { "roomateList.description.rent": 1 }; // Sort by rent in ascending order
+      sortOption = { "roomateList.description.rent": 1 };
     }
 
       const data = await roommateListCollection.find(query).sort(sortOption).toArray();
@@ -66,10 +67,26 @@ router.get("/roommateList", async (req, res) => {
   }
 });
 
-router.get("/roommateLists/:id", async (req, res) => {
+router.get("/roommate", async (req, res) => {
   try {
     const data = await roommateListCollection.find().toArray();
     res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+router.get("/roommate/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log("fffff",id);
+    const data = await roommateListCollection.findOne(new ObjectId (id));
+    console.log(data);
+    if (data) {
+      res.json(data);
+    } else {
+      res.status(404).json({ error: "Roommate list not found." });
+    }
   } catch (error) {
     res.status(500).json({ error: "Internal server error." });
   }
