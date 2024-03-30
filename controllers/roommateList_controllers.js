@@ -33,37 +33,49 @@ var upload = multer({
 
 router.get("/roommateList", async (req, res) => {
   try {
-      const { search, sort, gender } = req.query;
-      let query = {};
+    const { search, sort, gender } = req.query;
+    let query = {};
 
-     
-      if (search) {
-          query = {
-              $or: [
-                  { "roomateList.description.location.address": { $regex: new RegExp(search, "i") } },
-                  { "roomateList.description.location.city": { $regex: new RegExp(search, "i") } },
-                  
-              ]
-          };
-      }
+    if (search) {
+      query = {
+        $or: [
+          {
+            "roomateList.description.location.address": {
+              $regex: new RegExp(search, "i"),
+            },
+          },
+          {
+            "roomateList.description.location.city": {
+              $regex: new RegExp(search, "i"),
+            },
+          },
+        ],
+      };
+    }
 
-      // Filter by gender 
-      if (gender && (gender.toLowerCase() === 'female' || gender.toLowerCase() === 'male')) {
-        query["roomateList.roomatePreferences.gender"] = gender; 
-      }
+    // Filter by gender
+    if (
+      gender &&
+      (gender.toLowerCase() === "female" || gender.toLowerCase() === "male")
+    ) {
+      query["roomateList.roomatePreferences.gender"] = gender;
+    }
 
-      // Sort by rent (price)
+    // Sort by rent (price)
     let sortOption = {};
     if (sort === "High To Low") {
-      sortOption = { "roomateList.description.rent": -1 }; 
+      sortOption = { "roomateList.description.rent": -1 };
     } else if (sort === "Low To High") {
       sortOption = { "roomateList.description.rent": 1 };
     }
 
-      const data = await roommateListCollection.find(query).sort(sortOption).toArray();
-      res.json(data);
+    const data = await roommateListCollection
+      .find(query)
+      .sort(sortOption)
+      .toArray();
+    res.json(data);
   } catch (error) {
-      res.status(500).json({ error: "Internal server error." });
+    res.status(500).json({ error: "Internal server error." });
   }
 });
 
@@ -79,8 +91,8 @@ router.get("/roommate", async (req, res) => {
 router.get("/roommate/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    console.log("fffff",id);
-    const data = await roommateListCollection.findOne(new ObjectId (id));
+    console.log("fffff", id);
+    const data = await roommateListCollection.findOne(new ObjectId(id));
     console.log(data);
     if (data) {
       res.json(data);
@@ -157,7 +169,7 @@ router.post(
             firstName,
             lastName,
             phone: Phone,
-            userEmploymentStatus
+            userEmploymentStatus,
           },
         },
       };
@@ -166,7 +178,9 @@ router.post(
       await roommateListCollection.insertOne(newRoommateList);
 
       // Send a success response
-      res.status(201).json({ message: "Roommate list data added successfully." });
+      res
+        .status(201)
+        .json({ message: "Roommate list data added successfully." });
     } catch (error) {
       console.error("Error:", error);
       res.status(500).json({ error: "Internal server error." });
