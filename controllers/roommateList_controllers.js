@@ -116,6 +116,7 @@ router.post(
       const {
         userEmail,
         userId,
+        userImage,
         bedroomType,
         bathroom,
         availableFrom,
@@ -144,6 +145,7 @@ router.post(
       const newRoommateList = {
         userEmail,
         userId,
+        userImage,
         roomateList: {
           description: {
             bedroomType,
