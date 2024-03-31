@@ -95,29 +95,28 @@ router.get("/verifyToken", verifyToken, (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(email, password);
+    // console.log(email, password);
     // Input validation:
     if (!email || !password) {
-      throw new Error("Both email and password are required.");
+      res.status(401).json({ error: "Invalid email or password." });
     }
 
     // Search by email only:
     const user = await userCollection.findOne({ email });
 
-    // console.log(user);
     // Handle cases where no user is found or password is incorrect:
     if (!user || !(await bcrypt.compare(password, user.password))) {
       res.status(401).json({ error: "Invalid email or password." });
       return; // Prevent duplicate error message in case both conditions are met
     }
-
+    
     const token = jwt.sign({ user }, "12345fhhhfkjhfnnvjfjjfjjfjfjjfjf", {
       expiresIn: "7d",
     });
 
-    // console.log(token);
+    // console.log("tokenss",token);
 
-    res.json({ auth: true, token, user: user });
+    res.status(200).json({ auth: true, token, user: user });
   } catch (error) {
     res.status(500).json({ error: "Internal server error." });
   }
@@ -157,14 +156,14 @@ router.get("/user/:email", async (req, res) => {
 });
 
 //patch
-router.patch("/update/:email", upload.single("images"), async (req, res) => {
+router.put("/update/:email", upload.single("images"), async (req, res) => {
   try {
     const email = req.params.email;
     const { firstName, lastName, age, address, city, postalCode, password } =
       req.body;
-    
-    let userToUpdate = {location:{}};
 
+    let userToUpdate = { location: {} };
+    console.log(req.body)
     // Retrieve existing user data
     const existingUser = await userCollection.findOne({ email });
 
@@ -196,10 +195,21 @@ router.patch("/update/:email", upload.single("images"), async (req, res) => {
       { email },
       { $set: userToUpdate }
     );
+    const updatedUser = await userCollection.findOne({ email });
+    const token = jwt.sign(
+      { updatedUser },
+      "12345fhhhfkjhfnnvjfjjfjjfjfjjfjf",
+      {
+        expiresIn: "7d",
+      }
+    );
 
-    res
-      .status(200)
-      .json({ message: "User updated successfully", data: userToUpdate });
+    res.json({ auth: true, token, user: updatedUser });
+
+    // console.log("Results", result);
+    // res
+    //   .status(200)
+    //   .json({ message: "User updated successfully", data: userToUpdate });
   } catch (error) {
     console.error("Error updating user:", error);
     res.status(500).json({ error: "Internal server error." });
