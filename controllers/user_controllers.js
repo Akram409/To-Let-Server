@@ -109,7 +109,7 @@ router.post("/login", async (req, res) => {
       res.status(401).json({ error: "Invalid email or password." });
       return; // Prevent duplicate error message in case both conditions are met
     }
-    
+
     const token = jwt.sign({ user }, "12345fhhhfkjhfnnvjfjjfjjfjfjjfjf", {
       expiresIn: "7d",
     });
@@ -159,11 +159,21 @@ router.get("/user/:email", async (req, res) => {
 router.put("/update/:email", upload.single("images"), async (req, res) => {
   try {
     const email = req.params.email;
-    const { firstName, lastName, age, address, city, postalCode, password } =
-      req.body;
+    const {
+      firstName,
+      lastName,
+      age,
+      address,
+      city,
+      postalCode,
+      password,
+      user_image,
+      user_pass
+    } = req.body;
 
     let userToUpdate = { location: {} };
-    console.log(req.body)
+    console.log(req.body);
+    // console.log(req.file)
     // Retrieve existing user data
     const existingUser = await userCollection.findOne({ email });
 
@@ -179,16 +189,20 @@ router.put("/update/:email", upload.single("images"), async (req, res) => {
     if (city) userToUpdate.location.city = city;
     if (postalCode) userToUpdate.location.postalCode = postalCode;
 
-    // If password is provided, hash it before updating
-    if (password) {
+    if (password !== "") {
       const hashedPassword = await bcrypt.hash(password, 10);
       userToUpdate.password = hashedPassword;
+    } else {
+      userToUpdate.password = user_pass;
     }
 
     // If an image is uploaded, update the image field
     if (req.file) {
-      userToUpdate.user_image = req.file.filename;
+      userToUpdate.user_image = req.file?.filename;
+    } else if (user_image) {
+      userToUpdate.user_image = user_image;
     }
+
     console.log(userToUpdate);
     // Update user data in the database
     const result = await userCollection.updateOne(
@@ -214,6 +228,8 @@ router.put("/update/:email", upload.single("images"), async (req, res) => {
     console.error("Error updating user:", error);
     res.status(500).json({ error: "Internal server error." });
   }
+  console.log("🚀 ~ router.put ~ req.body:", req.body);
+  console.log("🚀 ~ router.put ~ req.body:", req.body);
 });
 
 module.exports = router;
